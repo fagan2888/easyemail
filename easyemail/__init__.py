@@ -12,19 +12,19 @@ class EasyEmail(object):
     """
     This class aims to abstract sending emails from templates, for now it
     covers only mako templating system but jinja2 is on its way.
-    
+
     Constructor arguments:
-    
+
     ``to``
-    
+
        Defaults to empty list, can be list of emails or string.
-    
+
     ``sender``
-    
+
        Defaults to empty string - this should contain email of the sender (from)
-    
+
     ``subject``
-    
+
        Defaults to empty string - should contain subject of the message
     """
     def __init__(self, to=[], sender='', subject=''):
@@ -103,6 +103,6 @@ class EasyEmail(object):
         self.message['Subject'] = self.subject
         self.message['From'] = self.sender
         if isinstance(self.to, list):
-            self.message['To'] = ', '.join(to)
+            self.message['To'] = ', '.join(self.to)
         else:
             self.message['To'] = self.to
