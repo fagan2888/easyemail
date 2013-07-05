@@ -26,11 +26,11 @@ EasyEmail is an open source software and your contribution is very much
 appreciated.
 
 1. Check for
-   `open issues https://github.com/niktto/easyemail/issues or
-   `open a fresh issue https://github.com/niktto/easyemail/issues/new
+   open issues https://github.com/niktto/easyemail/issues or
+   open a fresh issue https://github.com/niktto/easyemail/issues/new
    to start a discussion around a feature idea or a bug.
 2. Fork the
-   `repository on Github https://github.com/niktto/easyemail
+   repository on Github https://github.com/niktto/easyemail
    and make your changes.
 3. Follow these rules: PEP8, PEP257 and The
    Zen of Python.
