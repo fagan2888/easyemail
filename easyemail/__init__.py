@@ -1,3 +1,8 @@
+"""Small lib abstracting creation and sending emails with smtplib.
+This is work in progress, please do not use it in production.
+
+"""
+
 from email.mime.application import MIMEApplication
 from email.mime.audio import MIMEAudio
 from email.mime.image import MIMEImage
@@ -32,11 +37,12 @@ class EasyEmail(object):
         ...         )
         >>> email.send()
 
-    :params to: Defaults to empty list, can be list of emails or string.
-    :params sender: Defaults to empty string - this should contain email
+    :param to: Defaults to empty list, can be list of emails or string.
+    :param sender: Defaults to empty string - this should contain email
         of the sender (from).
-    :params subject: Defaults to empty string - should contain subject of
+    :param subject: Defaults to empty string - should contain subject of
         the message.
+
     """
 
     def __init__(self, to=[], sender='', subject=''):
@@ -48,40 +54,44 @@ class EasyEmail(object):
     def attach_image(self, image_content, subtype=None):
         """Attach image binary data to message.
 
-        :params image_content: :py:class:`email.mime.image.MIMEImage`
+        :param image_content: :py:class:`email.mime.image.MIMEImage`
             parameter `_imagedata`.
-        :params _subtype: :py:class:`email.mime.image.MIMEImage`
+        :param _subtype: :py:class:`email.mime.image.MIMEImage`
             parameter `_subtype` (defaults to None).
+
         """
         self.message.attach(MIMEImage(image_content, _subtype=subtype))
 
     def attach_binary(self, binary_data, subtype=None):
         """Attach binary data to message.
 
-        :params binary_data: :py:class:`email.mime.application.MIMEApplication`
+        :param binary_data: :py:class:`email.mime.application.MIMEApplication`
             parameter `_data`.
-        :params _subtype: :py:class:`email.mime.application.MIMEApplication`
+        :param _subtype: :py:class:`email.mime.application.MIMEApplication`
             parameter `_subtype` (defaults to None).
+
         """
         self.message.attach(MIMEApplication(binary_data, _subtype=subtype))
 
     def attach_text(self, text, subtype=None):
         """Attach text data to message.
 
-        :params text: :py:class:`email.mime.text.MIMEText`
+        :param text: :py:class:`email.mime.text.MIMEText`
             parameter `_text`.
-        :params _subtype: :py:class:`email.mime.text.MIMEText`
+        :param _subtype: :py:class:`email.mime.text.MIMEText`
             parameter `_subtype` (defaults to None).
+
         """
         self.message.attach(MIMEText(text, _subtype=subtype))
 
     def attach_audio(self, audio_data, subtype=None):
         """Attach text data to message.
 
-        :params audio_data: :py:class:`email.mime.audio.MIMEAudio`
+        :param audio_data: :py:class:`email.mime.audio.MIMEAudio`
             parameter `_audiodata`.
-        :params _subtype: :py:class:`email.mime.audio.MIMEAudio`
+        :param _subtype: :py:class:`email.mime.audio.MIMEAudio`
             parameter `_subtype` (defaults to None).
+
         """
         self.message.attach(MIMEAudio(audio_data, _subtype=subtype))
 
@@ -89,11 +99,12 @@ class EasyEmail(object):
                       ttype='mako'):
         """Load text template and attach to message.
 
-        :params template_file_path: file path to template file.
-        :params context: optional context for rendered template.
-        :params data_type: mapped as `_subtype` in :func:`attach_text`.
-        :params ttype: Template format type (defaults fo mako, for now can't
+        :param template_file_path: file path to template file.
+        :param context: optional context for rendered template.
+        :param data_type: mapped as `_subtype` in :func:`attach_text`.
+        :param ttype: Template format type (defaults fo mako, for now can't
             be anything else).
+
         """
 
         if ttype == 'mako':
@@ -101,18 +112,20 @@ class EasyEmail(object):
                 template = Template(template_file.read()).render(**context)
                 self.attach_text(template, data_type)
 
-    def send(self, connection_type='smtp', authentication=False, **smtp_params):
-        """Send prebuilded message.
+    def send(self, connection_type='smtp', authentication=False,
+             **smtp_params):
+        r"""Send prebuilded message.
 
-        :params connection_type: string with type of connection. Possible
+        :param connection_type: string with type of connection. Possible
             choices are: `smtp` (default), `ssl` and `tls`.
-        :params authentication: `boolean` (default False), set it to True if
+        :param authentication: `boolean` (default False), set it to True if
             server that you use for sending uses authentication. If this
             parameter is set to True - you need to supply `login` and
             `password` keyword arguments.
-        :params \*\*smtp_params: Additional parameters depending on
+        :param \*\*smtp_params: Additional parameters depending on
             `connection_type` chosen. For full list and description please go
             to :py:mod:`smtplib`.
+
         """
 
         self._compose()
@@ -120,26 +133,27 @@ class EasyEmail(object):
             connection_type, authentication, **smtp_params
         )
         smtp_connection.sendmail(
-            from_addr = self.sender,
-            to_addrs = self.to,
-            msg = self.message.as_string()
+            from_addr=self.sender,
+            to_addrs=self.to,
+            msg=self.message.as_string()
         )
         smtp_connection.quit()
 
     def _connect(self, connection_type, authentication, **smtp_params):
-        """Create smtplib connection for different connection types.
+        r"""Create smtplib connection for different connection types.
 
         Returns active smtp connection that need to be closed after usage.
 
-        :params connection_type: string with type of connection. Possible
+        :param connection_type: string with type of connection. Possible
             choices are: `smtp` (default), `ssl` and `tls`.
-        :params authentication: `boolean` (default False), set it to True if
+        :param authentication: `boolean` (default False), set it to True if
             server that you use for sending uses authentication. If this
             parameter is set to True - you need to supply `login` and
             `password` keyword arguments.
-        :params \*\*smtp_params: Additional parameters depending on
+        :param \*\*smtp_params: Additional parameters depending on
             `connection_type` chosen. For full list and description please go
             to :py:mod:`smtplib`.
+
         """
 
         if connection_type == 'smtp':
@@ -181,8 +195,8 @@ class EasyEmail(object):
         return smtp_connection
 
     def _compose(self):
-        """Compose message from object attributes.
-        """
+        """Compose message from object attributes."""
+
         self.message['Subject'] = self.subject
         self.message['From'] = self.sender
         if isinstance(self.to, list):
