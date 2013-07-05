@@ -10,7 +10,7 @@ def read(filename):
 
 setup(
     name='easyemail',
-    version='0.01-dev',
+    version='0.1.3',
     description="Simple lib abstracting email sending with smtplib.",
     long_description=read('README.md'),
     url='http://github.com/niktto/easyemail/',
