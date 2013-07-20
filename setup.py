@@ -1,10 +1,20 @@
 from setuptools import setup
+import os
+
+
+def read(filename):
+    """Open a file and return its contents."""
+    with open(os.path.join(os.path.dirname(__file__), filename)) as f:
+        return f.read()
+
 
 setup(
     name='easyemail',
-    version='0.01-dev',
+    version='0.1.3',
+    description="Simple lib abstracting email sending with smtplib.",
+    long_description=read('README.md'),
     url='http://github.com/niktto/easyemail/',
-    license='BSD',
+    license=read('LICENSE'),
     author=u'Marek Szwalkiewicz',
     author_email='marek@szwalkiewicz.waw.pl',
     packages=['easyemail'],
@@ -25,5 +35,4 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    #test_suite='easyemail.tests'
 )
