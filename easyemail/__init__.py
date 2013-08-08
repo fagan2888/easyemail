@@ -10,8 +10,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib
 
-from mako.template import Template
-
 
 class EasyEmail(object):
 
@@ -96,21 +94,37 @@ class EasyEmail(object):
         self.message.attach(MIMEAudio(audio_data, _subtype=subtype))
 
     def load_template(self, template_file_path, context, data_type='html',
-                      ttype='mako'):
+                      ttype='mako', filelike=None):
         """Load text template and attach to message.
 
         :param template_file_path: file path to template file.
         :param context: optional context for rendered template.
         :param data_type: mapped as `_subtype` in :func:`attach_text`.
-        :param ttype: Template format type (defaults fo mako, for now can't
-            be anything else).
+        :param ttype: Template format type (defaults fo `mako`, `jinja2` is
+            now an option).
+        :param filelike: For easier testing - you can supply StrinIO with
+            template to render from it.
 
         """
 
         if ttype == 'mako':
-            with open(template_file_path, 'r') as template_file:
-                template = Template(template_file.read()).render(**context)
-                self.attach_text(template, data_type)
+            from mako.template import Template
+        elif ttype == 'jinja2':
+            from jinja2 import Template
+
+        if not filelike:
+            template_file = open(template_file_path, 'r')
+        else:
+            template_file = filelike
+
+        try:
+            template = Template(template_file.read()).render(**context)
+            self.attach_text(template, data_type)
+        except Exception:
+            # I have no better idea how to make sure that file fill be closed.
+            pass
+        finally:
+            template_file.close()
 
     def send(self, connection_type='smtp', authentication=False,
              **smtp_params):
@@ -138,6 +152,18 @@ class EasyEmail(object):
             msg=self.message.as_string()
         )
         smtp_connection.quit()
+
+    def dump(self):
+        """Generate simple testing drop of message.
+
+        Returns string that has all the information that would be sent.
+
+        """
+
+        self._compose()
+        dumped = self.message.as_string()
+
+        return dumped
 
     def _connect(self, connection_type, authentication, **smtp_params):
         r"""Create smtplib connection for different connection types.
