@@ -1,5 +1,7 @@
 from setuptools import setup
+from setuptools.command.test import test as TestCommand
 import os
+import sys
 
 
 def read(filename):
@@ -8,9 +10,24 @@ def read(filename):
         return f.read()
 
 
+class PyTest(TestCommand):
+    """Command to run unit tests after in-place build."""
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['tests']
+        self.test_suite = True
+
+    def run_tests(self):
+        # Importing here, `cause outside the eggs aren't loaded.
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
+
+
 setup(
     name='easyemail',
-    version='0.1.3',
+    version='0.2.3',
     description="Simple lib abstracting email sending with smtplib.",
     long_description=read('README.md'),
     url='http://github.com/niktto/easyemail/',
@@ -21,9 +38,9 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'Mako==0.7.3',
-    ],
+    install_requires=[],
+    tests_require=['pytest', 'Jinja2>=2.7.1', 'Mako>=0.7.3'],
+    cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',

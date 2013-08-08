@@ -11,6 +11,16 @@ Install with pip::
 
     $ pip install easyemail
 
+Testing
+-------
+
+To run tests, you'll need `mako` and `jinja2` libraries that are not included
+in requirements in normal setup.
+
+You can run tests that way::
+
+    $ python setup.py test
+
 Issues and questions
 --------------------
 
