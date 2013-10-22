@@ -27,7 +27,7 @@ class PyTest(TestCommand):
 
 setup(
     name='easyemail',
-    version='0.2.3',
+    version='0.3.0',
     description="Simple lib abstracting email sending with smtplib.",
     long_description=read('README.md'),
     url='http://github.com/niktto/easyemail/',

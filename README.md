@@ -4,6 +4,12 @@ easyemail
 Small lib abstracting creation and sending emails with smtplib. This is work in
 progress, please do not use it in production.
 
+WARNING
+-------
+
+From version 0.3 and up I stopped supporting template rendering inside of the
+library. Now you need to render html / text on your side and use attach_text.
+
 Installation
 ------------
 
