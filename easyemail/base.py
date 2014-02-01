@@ -3,6 +3,7 @@ from email.mime.audio import MIMEAudio
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import email.utils
 import smtplib
 import codecs
 
@@ -214,3 +215,9 @@ class EasyEmail(object):
             self.message['To'] = ', '.join(self.to)
         else:
             self.message['To'] = self.to
+
+        # We need to make sure that proper date is set in email header.
+        if self.message.get('Date') is None:
+            now = email.utils.formatdate(localtime=True)
+            self.message['Date'] = now
+

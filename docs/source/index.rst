@@ -7,4 +7,4 @@
 :mod:`easyemail` Package
 ========================
 
-.. automodule:: easyemail
+.. automodule:: easyemail.base
