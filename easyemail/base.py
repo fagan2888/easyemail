@@ -3,6 +3,7 @@ from email.mime.audio import MIMEAudio
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 import email.utils
 import smtplib
 
@@ -10,9 +11,6 @@ import smtplib
 class EasyEmail(object):
 
     """Send prepared email using smtplib buildin capabilities.
-
-    This class aims to abstract sending emails from templates, for now it
-    covers only mako templating system but jinja2 is on its way.
 
     Usage::
 
@@ -38,10 +36,22 @@ class EasyEmail(object):
         the message.
     :param charset: Defaults to UTF-8 but can be used to specify message
         encoding.
+    :param parent: Optional class subclassing MIMEBase that will be a base
+        message with default MIMEMultipart('alternative') inside. Useful in
+        case of adding attachments, you then can add MIMEMultipart('mixed')
+        as a parent. Leave as `None` to not pack default message in anything.
 
     """
 
-    def __init__(self, to=[], sender='', subject='', charset='utf-8'):
+    def __init__(self, to=[], sender='', subject='', charset='utf-8',
+                 parent=None):
+
+        if parent is not None:
+            if not isinstance(parent, MIMEBase):
+                raise ValueError("Optional parent need to subclass MIMEBase")
+
+        self.parent = parent
+
         self.message = MIMEMultipart('alternative')
         self.message.set_charset(charset)
         self.subject = subject
@@ -127,14 +137,14 @@ class EasyEmail(object):
 
         """
 
-        self._compose()
+        message = self._compose()
         smtp_connection = self._connect(
             connection_type, authentication, **smtp_params
         )
         smtp_connection.sendmail(
             from_addr=self.sender,
             to_addrs=self.to,
-            msg=self.message.as_string()
+            msg=message.as_string()
         )
         smtp_connection.quit()
 
@@ -145,8 +155,8 @@ class EasyEmail(object):
 
         """
 
-        self._compose()
-        dumped = self.message.as_string()
+        message = self._compose()
+        dumped = message.as_string()
 
         return dumped
 
@@ -208,15 +218,22 @@ class EasyEmail(object):
     def _compose(self):
         """Compose message from object attributes."""
 
-        self.message['Subject'] = self.subject
-        self.message['From'] = self.sender
-        if isinstance(self.to, list):
-            self.message['To'] = ', '.join(self.to)
+        if self.parent is not None:
+            self.parent.attach(self.message)
+            message = self.parent
         else:
-            self.message['To'] = self.to
+            message = self.message
+
+        message['Subject'] = self.subject
+        message['From'] = self.sender
+        if isinstance(self.to, list):
+            message['To'] = ', '.join(self.to)
+        else:
+            message['To'] = self.to
 
         # We need to make sure that proper date is set in email header.
-        if self.message.get('Date') is None:
+        if message.get('Date') is None:
             now = email.utils.formatdate(localtime=True)
-            self.message['Date'] = now
+            message['Date'] = now
 
+        return message
