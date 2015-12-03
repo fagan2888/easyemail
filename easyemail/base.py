@@ -226,7 +226,7 @@ class EasyEmail(object):
 
         message['Subject'] = self.subject
         message['From'] = self.sender
-        if isinstance(self.to, list):
+        if hasattr(self.to, '__iter__'):
             message['To'] = ', '.join(self.to)
         else:
             message['To'] = self.to
